@@ -1,10 +1,11 @@
-export const locales = ["ar", "en"] as const;
+export const locales = ["ar", "en", "nl"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "ar";
 
 export const localeDirection: Record<Locale, "rtl" | "ltr"> = {
   ar: "rtl",
   en: "ltr",
+  nl: "ltr",
 };
 
 export function isLocale(value: string): value is Locale {

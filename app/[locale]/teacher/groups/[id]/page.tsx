@@ -5,6 +5,9 @@ import { localizedHref } from "@/lib/i18n/path";
 import { createClient } from "@/lib/supabase/server";
 import { AddTeacherSessionForm } from "@/components/teacher/add-teacher-session-form";
 import { AttendanceForm } from "@/components/teacher/attendance-form";
+import { AddTeacherScheduleSlotForm } from "@/components/teacher/add-teacher-schedule-slot-form";
+import { DeleteItemButton } from "@/components/admin/delete-item-button";
+import { deleteTeacherScheduleSlotAction } from "@/lib/actions/teacher";
 
 export default async function TeacherGroupDetailPage({
   params,
@@ -38,6 +41,13 @@ export default async function TeacherGroupDetailPage({
     .select("id, scheduled_at, meeting_url")
     .eq("group_id", id)
     .order("scheduled_at", { ascending: true });
+
+  const { data: slots } = await supabase
+    .from("group_schedule_slots")
+    .select("id, weekday, start_time, end_time")
+    .eq("group_id", id)
+    .order("weekday", { ascending: true })
+    .order("start_time", { ascending: true });
 
   const { data: upcomingSessions } = await supabase
     .from("class_sessions")
@@ -93,6 +103,32 @@ export default async function TeacherGroupDetailPage({
         )}
       </section>
 
+      <section className="space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm sm:p-8">
+        <h2 className="font-bold text-brand-green">{t.weeklyScheduleTitle}</h2>
+        {slots && slots.length > 0 ? (
+          <ul className="space-y-2">
+            {slots.map((slot) => (
+              <li
+                key={slot.id}
+                className="flex items-center justify-between gap-3 rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80"
+              >
+                <span>
+                  {dict.schedulePage.weekdays[slot.weekday]} · {slot.start_time.slice(0, 5)}–{slot.end_time.slice(0, 5)}
+                </span>
+                <DeleteItemButton
+                  action={deleteTeacherScheduleSlotAction}
+                  hiddenFields={{ slotId: slot.id, groupId: id, locale }}
+                  label={t.deleteButton}
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-brand-dark/60">{t.noWeeklySlots}</p>
+        )}
+        <AddTeacherScheduleSlotForm dict={dict} groupId={id} />
+      </section>
+
       {attendanceTarget && students && students.length > 0 && (
         <AttendanceForm
           dict={dict}
@@ -109,7 +145,7 @@ export default async function TeacherGroupDetailPage({
           <ul className="space-y-2">
             {allSessions.map((s) => (
               <li key={s.id} className="rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80">
-                {new Date(s.scheduled_at).toLocaleString(locale === "ar" ? "ar" : "en", {
+                {new Date(s.scheduled_at).toLocaleString(locale, {
                   dateStyle: "medium",
                   timeStyle: "short",
                 })}

@@ -17,6 +17,7 @@ export function AddGroupForm({
   programs,
   levels,
   teachers,
+  maqraas,
   onCancel,
 }: {
   dict: Dictionary;
@@ -24,6 +25,7 @@ export function AddGroupForm({
   programs: { id: string; name_ar: string; name_en: string }[];
   levels: { id: string; program_id: string; name_ar: string; name_en: string }[];
   teachers: { id: string; full_name: string }[];
+  maqraas: { id: string; name: string }[];
   onCancel: () => void;
 }) {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
@@ -94,6 +96,20 @@ export function AddGroupForm({
           </label>
           <input id="capacity" name="capacity" type="number" min={1} defaultValue={8} className={inputClass} />
         </div>
+      </div>
+
+      <div>
+        <label className={labelClass} htmlFor="maqraaId">
+          {t.maqraa}
+        </label>
+        <select id="maqraaId" name="maqraaId" defaultValue="" className={inputClass}>
+          <option value="">{t.noneOption}</option>
+          {maqraas.map((maqraa) => (
+            <option key={maqraa.id} value={maqraa.id}>
+              {maqraa.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {state && !state.success && <p className="text-sm text-red-600">{dict.adminPage.errors.generic}</p>}

@@ -50,7 +50,7 @@ export async function generateMetadata({
       title: dict.meta.siteName,
       description: dict.meta.defaultDescription,
       siteName: dict.meta.siteName,
-      locale: locale === "ar" ? "ar_AR" : "en_US",
+      locale: { ar: "ar_AR", en: "en_US", nl: "nl_NL" }[locale],
       type: "website",
       images: ["/opengraph-image.jpg"],
     },

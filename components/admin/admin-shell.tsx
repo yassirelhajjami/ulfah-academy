@@ -60,6 +60,7 @@ export function AdminShell({
     { href: "/admin/teachers", label: dict.adminPage.nav.teachers, exact: false },
     { href: "/admin/groups", label: dict.adminPage.nav.groups, exact: false },
     { href: "/admin/students", label: dict.adminPage.nav.students, exact: false },
+    { href: "/admin/maqraas", label: dict.adminPage.nav.maqraas, exact: false },
   ];
 
   return (

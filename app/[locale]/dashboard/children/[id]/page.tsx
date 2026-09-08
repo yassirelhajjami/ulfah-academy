@@ -72,7 +72,7 @@ export default async function ChildDetailPage({
           <ul className="mt-4 space-y-2">
             {sessions.map((s) => (
               <li key={s.id} className="rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80">
-                {new Date(s.scheduled_at).toLocaleString(locale === "ar" ? "ar" : "en", {
+                {new Date(s.scheduled_at).toLocaleString(locale, {
                   dateStyle: "medium",
                   timeStyle: "short",
                 })}
@@ -107,7 +107,7 @@ export default async function ChildDetailPage({
           <ul className="mt-4 space-y-2">
             {reports.map((r) => (
               <li key={r.id} className="rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80">
-                {new Date(r.week_start).toLocaleDateString(locale === "ar" ? "ar" : "en", { dateStyle: "medium" })} —{" "}
+                {new Date(r.week_start).toLocaleDateString(locale, { dateStyle: "medium" })} —{" "}
                 {r.sessions_attended}/{r.sessions_total}
               </li>
             ))}

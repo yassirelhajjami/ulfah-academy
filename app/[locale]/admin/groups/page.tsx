@@ -10,11 +10,12 @@ export default async function AdminGroupsPage({
   const { locale, dict } = await resolveLocale(params);
   const supabase = await createClient();
 
-  const [groupsResult, programsResult, levelsResult, teachersResult] = await Promise.all([
+  const [groupsResult, programsResult, levelsResult, teachersResult, maqraasResult] = await Promise.all([
     supabase.from("groups").select("id, name, capacity, teachers(profiles(full_name)), students(id)"),
     supabase.from("programs").select("id, name_ar, name_en").order("name_ar"),
     supabase.from("levels").select("id, program_id, name_ar, name_en, sort_order").order("sort_order"),
     supabase.from("teachers").select("id, profiles(full_name)"),
+    supabase.from("maqraas").select("id, name").order("name"),
   ]);
 
   type RawGroup = {
@@ -45,6 +46,7 @@ export default async function AdminGroupsPage({
       programs={programsResult.data ?? []}
       levels={levelsResult.data ?? []}
       teachers={teachers}
+      maqraas={maqraasResult.data ?? []}
     />
   );
 }

@@ -3,9 +3,10 @@ import Link from "next/link";
 import { resolveLocale } from "@/lib/i18n/resolve";
 import { localizedHref } from "@/lib/i18n/path";
 import { createClient } from "@/lib/supabase/server";
-import { AddMemorizationForm } from "@/components/teacher/add-memorization-form";
-import { AddRevisionForm } from "@/components/teacher/add-revision-form";
-import { AddWeeklyReportForm } from "@/components/teacher/add-weekly-report-form";
+import { MemorizationSection, type MemorizationListItem } from "@/components/teacher/memorization-section";
+import { RevisionSection, type RevisionListItem } from "@/components/teacher/revision-section";
+import { DailyReportSection, type DailyReportListItem } from "@/components/teacher/daily-report-section";
+import { WeeklyReportSection, type WeeklyReportListItem } from "@/components/teacher/weekly-report-section";
 
 export default async function TeacherStudentDetailPage({
   params,
@@ -31,7 +32,7 @@ export default async function TeacherStudentDetailPage({
 
   if (!studentRow || studentRow.groups?.teacher_id !== user?.id) notFound();
 
-  const [surahsResult, memorizationResult, revisionResult, reportsResult] = await Promise.all([
+  const [surahsResult, memorizationResult, revisionResult, reportsResult, evaluationsResult, sessionsResult] = await Promise.all([
     supabase.from("quran_surahs").select("id, name_ar, name_en").order("id"),
     supabase
       .from("student_memorization")
@@ -41,40 +42,105 @@ export default async function TeacherStudentDetailPage({
       .limit(10),
     supabase
       .from("student_revision")
-      .select("id, surah_id, ayah_from, ayah_to, revision_type, quran_surahs(name_ar, name_en)")
+      .select("id, surah_id, ayah_from, ayah_to, revision_type, quality_rating, quran_surahs(name_ar, name_en)")
       .eq("student_id", id)
       .order("recorded_at", { ascending: false })
       .limit(10),
     supabase
       .from("weekly_reports")
-      .select("id, week_start, week_end, new_ayahs_memorized")
+      .select(
+        "id, week_start, week_end, sessions_attended, sessions_total, new_ayahs_memorized, revision_score, tajweed_score, teacher_notes, next_week_goals"
+      )
       .eq("student_id", id)
       .order("week_start", { ascending: false })
       .limit(10),
+    supabase
+      .from("evaluations")
+      .select(
+        "id, session_id, memorization_score, tajweed_score, revision_score, participation_score, notes, class_sessions(scheduled_at)"
+      )
+      .eq("student_id", id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    studentRow.group_id
+      ? supabase
+          .from("class_sessions")
+          .select("id, scheduled_at")
+          .eq("group_id", studentRow.group_id)
+          .order("scheduled_at", { ascending: false })
+          .limit(20)
+      : Promise.resolve({ data: [] as { id: string; scheduled_at: string }[] }),
   ]);
 
   const surahs = surahsResult.data ?? [];
-  const nameKey = locale === "ar" ? "name_ar" : "name_en";
 
   type MemoRow = {
     id: string;
+    surah_id: number;
     ayah_from: number;
     ayah_to: number;
     status: string;
     quran_surahs: { name_ar: string; name_en: string } | null;
   };
-  const memorization = (memorizationResult.data ?? []) as unknown as MemoRow[];
+  const memorization: MemorizationListItem[] = ((memorizationResult.data ?? []) as unknown as MemoRow[]).map((m) => ({
+    id: m.id,
+    surah_id: m.surah_id,
+    ayah_from: m.ayah_from,
+    ayah_to: m.ayah_to,
+    status: m.status,
+    surah_name_ar: m.quran_surahs?.name_ar ?? "—",
+    surah_name_en: m.quran_surahs?.name_en ?? "—",
+  }));
 
   type RevisionRow = {
     id: string;
+    surah_id: number;
     ayah_from: number;
     ayah_to: number;
     revision_type: string;
+    quality_rating: number | null;
     quran_surahs: { name_ar: string; name_en: string } | null;
   };
-  const revision = (revisionResult.data ?? []) as unknown as RevisionRow[];
+  const revision: RevisionListItem[] = ((revisionResult.data ?? []) as unknown as RevisionRow[]).map((r) => ({
+    id: r.id,
+    surah_id: r.surah_id,
+    ayah_from: r.ayah_from,
+    ayah_to: r.ayah_to,
+    revision_type: r.revision_type,
+    quality_rating: r.quality_rating,
+    surah_name_ar: r.quran_surahs?.name_ar ?? "—",
+    surah_name_en: r.quran_surahs?.name_en ?? "—",
+  }));
 
-  const reports = reportsResult.data ?? [];
+  const reports: WeeklyReportListItem[] = reportsResult.data ?? [];
+
+  type EvalRow = {
+    id: string;
+    session_id: string;
+    memorization_score: number | null;
+    tajweed_score: number | null;
+    revision_score: number | null;
+    participation_score: number | null;
+    notes: string | null;
+    class_sessions: { scheduled_at: string } | null;
+  };
+  const evaluations: DailyReportListItem[] = ((evaluationsResult.data ?? []) as unknown as EvalRow[]).map((e) => ({
+    id: e.id,
+    session_id: e.session_id,
+    memorization_score: e.memorization_score,
+    tajweed_score: e.tajweed_score,
+    revision_score: e.revision_score,
+    participation_score: e.participation_score,
+    notes: e.notes,
+    session_label: e.class_sessions
+      ? new Date(e.class_sessions.scheduled_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })
+      : "—",
+  }));
+
+  const sessionOptions = (sessionsResult.data ?? []).map((s) => ({
+    id: s.id,
+    label: new Date(s.scheduled_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }),
+  }));
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -91,54 +157,13 @@ export default async function TeacherStudentDetailPage({
         <h1 className="text-xl font-bold text-brand-dark">{studentRow.full_name}</h1>
       </div>
 
-      <section className="space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="font-bold text-brand-green">{t.memorizationTitle}</h2>
-        {memorization.length > 0 ? (
-          <ul className="space-y-2">
-            {memorization.map((m) => (
-              <li key={m.id} className="rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80">
-                {m.quran_surahs?.[nameKey] ?? "—"} ({m.ayah_from}–{m.ayah_to}) · {m.status}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-brand-dark/60">{t.noMemorization}</p>
-        )}
-        <AddMemorizationForm dict={dict} studentId={id} surahs={surahs} />
-      </section>
+      <MemorizationSection dict={dict} locale={locale} studentId={id} surahs={surahs} records={memorization} />
 
-      <section className="space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="font-bold text-brand-green">{t.revisionTitle}</h2>
-        {revision.length > 0 ? (
-          <ul className="space-y-2">
-            {revision.map((r) => (
-              <li key={r.id} className="rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80">
-                {r.quran_surahs?.[nameKey] ?? "—"} ({r.ayah_from}–{r.ayah_to}) · {r.revision_type}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-brand-dark/60">{t.noRevision}</p>
-        )}
-        <AddRevisionForm dict={dict} studentId={id} surahs={surahs} />
-      </section>
+      <RevisionSection dict={dict} locale={locale} studentId={id} surahs={surahs} records={revision} />
 
-      <section className="space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm sm:p-8">
-        <h2 className="font-bold text-brand-green">{t.reportsTitle}</h2>
-        {reports.length > 0 ? (
-          <ul className="space-y-2">
-            {reports.map((r) => (
-              <li key={r.id} className="rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80">
-                {new Date(r.week_start).toLocaleDateString(locale === "ar" ? "ar" : "en", { dateStyle: "medium" })} —{" "}
-                {r.new_ayahs_memorized} {locale === "ar" ? "آية" : "ayahs"}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-brand-dark/60">{t.noReports}</p>
-        )}
-        <AddWeeklyReportForm dict={dict} studentId={id} />
-      </section>
+      <DailyReportSection dict={dict} studentId={id} sessions={sessionOptions} records={evaluations} />
+
+      <WeeklyReportSection dict={dict} locale={locale} studentId={id} reports={reports} />
     </div>
   );
 }

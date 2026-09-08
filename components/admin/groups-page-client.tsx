@@ -22,6 +22,7 @@ export function GroupsPageClient({
   programs,
   levels,
   teachers,
+  maqraas,
 }: {
   dict: Dictionary;
   locale: Locale;
@@ -29,6 +30,7 @@ export function GroupsPageClient({
   programs: { id: string; name_ar: string; name_en: string }[];
   levels: { id: string; program_id: string; name_ar: string; name_en: string }[];
   teachers: { id: string; full_name: string }[];
+  maqraas: { id: string; name: string }[];
 }) {
   const [showForm, setShowForm] = useState(groups.length === 0);
   const t = dict.adminPage.groups;
@@ -58,6 +60,7 @@ export function GroupsPageClient({
           programs={programs}
           levels={levels}
           teachers={teachers}
+          maqraas={maqraas}
           onCancel={() => setShowForm(false)}
         />
       )}

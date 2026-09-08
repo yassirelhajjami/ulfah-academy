@@ -313,7 +313,26 @@ export interface Dictionary {
       teachers: string;
       groups: string;
       students: string;
+      maqraas: string;
       backToSite: string;
+    };
+    maqraas: {
+      title: string;
+      intro: string;
+      addButton: string;
+      emptyTitle: string;
+      emptyBody: string;
+      colName: string;
+      colGroups: string;
+      deleteButton: string;
+      form: {
+        title: string;
+        name: string;
+        description: string;
+        submit: string;
+        submitting: string;
+        cancel: string;
+      };
     };
     overview: {
       title: string;
@@ -357,6 +376,7 @@ export interface Dictionary {
         program: string;
         level: string;
         teacher: string;
+        maqraa: string;
         capacity: string;
         submit: string;
         submitting: string;
@@ -459,6 +479,8 @@ export interface Dictionary {
       sessionsTitle: string;
       noSessions: string;
       addSessionButton: string;
+      deleteButton: string;
+      editButton: string;
       sessionForm: {
         title: string;
         scheduledAt: string;
@@ -476,15 +498,30 @@ export interface Dictionary {
       };
       saveAttendance: string;
       savingAttendance: string;
+      weeklyScheduleTitle: string;
+      noWeeklySlots: string;
+      addSlotButton: string;
+      slotForm: {
+        title: string;
+        weekday: string;
+        startTime: string;
+        endTime: string;
+        submit: string;
+        submitting: string;
+        cancel: string;
+      };
     };
     studentDetail: {
       backToGroup: string;
       infoTitle: string;
+      editButton: string;
+      deleteButton: string;
       memorizationTitle: string;
       noMemorization: string;
       addMemorizationButton: string;
       memorizationForm: {
         title: string;
+        editTitle: string;
         surah: string;
         ayahFrom: string;
         ayahTo: string;
@@ -501,6 +538,7 @@ export interface Dictionary {
       addRevisionButton: string;
       revisionForm: {
         title: string;
+        editTitle: string;
         surah: string;
         ayahFrom: string;
         ayahTo: string;
@@ -512,11 +550,29 @@ export interface Dictionary {
         submitting: string;
         cancel: string;
       };
+      dailyReportsTitle: string;
+      noDailyReports: string;
+      addDailyReportButton: string;
+      dailyReportForm: {
+        title: string;
+        editTitle: string;
+        session: string;
+        memorizationScore: string;
+        tajweedScore: string;
+        revisionScore: string;
+        participationScore: string;
+        notes: string;
+        submit: string;
+        submitting: string;
+        cancel: string;
+      };
       reportsTitle: string;
       noReports: string;
+      ayahsUnit: string;
       addReportButton: string;
       reportForm: {
         title: string;
+        editTitle: string;
         weekStart: string;
         weekEnd: string;
         sessionsAttended: string;

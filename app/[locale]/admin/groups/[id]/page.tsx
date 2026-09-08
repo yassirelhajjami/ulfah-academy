@@ -114,7 +114,7 @@ export default async function AdminGroupDetailPage({
                 className="flex items-center justify-between gap-3 rounded-xl bg-brand-green/5 p-3 text-sm text-brand-dark/80"
               >
                 <span>
-                  {new Date(s.scheduled_at).toLocaleString(locale === "ar" ? "ar" : "en", {
+                  {new Date(s.scheduled_at).toLocaleString(locale, {
                     dateStyle: "medium",
                     timeStyle: "short",
                   })}

@@ -72,7 +72,7 @@ export default async function DashboardOverviewPage({
           <p className="text-sm text-brand-dark/60">{t.upcomingSessionTitle}</p>
           {upcomingSessions && upcomingSessions.length > 0 ? (
             <p className="mt-2 text-sm font-medium text-brand-dark">
-              {new Date(upcomingSessions[0].scheduled_at).toLocaleString(locale === "ar" ? "ar" : "en", {
+              {new Date(upcomingSessions[0].scheduled_at).toLocaleString(locale, {
                 dateStyle: "medium",
                 timeStyle: "short",
               })}
@@ -86,7 +86,7 @@ export default async function DashboardOverviewPage({
           <p className="text-sm text-brand-dark/60">{t.latestReportTitle}</p>
           {latestReports && latestReports.length > 0 ? (
             <p className="mt-2 text-sm font-medium text-brand-dark">
-              {new Date(latestReports[0].week_start).toLocaleDateString(locale === "ar" ? "ar" : "en", {
+              {new Date(latestReports[0].week_start).toLocaleDateString(locale, {
                 dateStyle: "medium",
               })}
             </p>

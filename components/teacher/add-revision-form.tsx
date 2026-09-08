@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionary-type";
-import { addRevisionAction, type ActionResult } from "@/lib/actions/teacher";
+import { addRevisionAction, updateRevisionAction, type ActionResult } from "@/lib/actions/teacher";
 
 const initialState: ActionResult | null = null;
 
@@ -10,22 +10,39 @@ const inputClass =
   "w-full rounded-xl border border-brand-dark/15 bg-white px-4 py-2.5 outline-none transition-all duration-200 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10";
 const labelClass = "mb-1 block text-sm font-medium text-brand-dark/80";
 
+export type RevisionRecord = {
+  id: string;
+  surah_id: number;
+  ayah_from: number;
+  ayah_to: number;
+  revision_type: string;
+  quality_rating: number | null;
+};
+
 export function AddRevisionForm({
   dict,
   studentId,
   surahs,
+  editing,
+  onDone,
 }: {
   dict: Dictionary;
   studentId: string;
   surahs: { id: number; name_ar: string; name_en: string }[];
+  editing?: RevisionRecord | null;
+  onDone?: () => void;
 }) {
   const [manuallyOpened, setManuallyOpened] = useState(false);
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
-    async (_prev, formData) => addRevisionAction(formData),
+    async (_prev, formData) => {
+      const result = editing ? await updateRevisionAction(formData) : await addRevisionAction(formData);
+      if (result.success) onDone?.();
+      return result;
+    },
     initialState
   );
   const t = dict.teacherPage.studentDetail.revisionForm;
-  const open = manuallyOpened && !state?.success;
+  const open = editing ? true : manuallyOpened && !state?.success;
 
   if (!open) {
     return (
@@ -42,13 +59,14 @@ export function AddRevisionForm({
   return (
     <form action={formAction} className="space-y-4 rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm">
       <input type="hidden" name="studentId" value={studentId} />
-      <h3 className="font-bold text-brand-green">{t.title}</h3>
+      {editing && <input type="hidden" name="id" value={editing.id} />}
+      <h3 className="font-bold text-brand-green">{editing ? t.editTitle : t.title}</h3>
 
       <div>
         <label className={labelClass} htmlFor="surahId">
           {t.surah}
         </label>
-        <select id="surahId" name="surahId" required defaultValue="" className={inputClass}>
+        <select id="surahId" name="surahId" required defaultValue={editing?.surah_id ?? ""} className={inputClass}>
           <option value="" disabled>
             —
           </option>
@@ -65,13 +83,29 @@ export function AddRevisionForm({
           <label className={labelClass} htmlFor="ayahFrom">
             {t.ayahFrom}
           </label>
-          <input id="ayahFrom" name="ayahFrom" type="number" min={1} required className={inputClass} />
+          <input
+            id="ayahFrom"
+            name="ayahFrom"
+            type="number"
+            min={1}
+            required
+            defaultValue={editing?.ayah_from}
+            className={inputClass}
+          />
         </div>
         <div>
           <label className={labelClass} htmlFor="ayahTo">
             {t.ayahTo}
           </label>
-          <input id="ayahTo" name="ayahTo" type="number" min={1} required className={inputClass} />
+          <input
+            id="ayahTo"
+            name="ayahTo"
+            type="number"
+            min={1}
+            required
+            defaultValue={editing?.ayah_to}
+            className={inputClass}
+          />
         </div>
       </div>
 
@@ -80,7 +114,7 @@ export function AddRevisionForm({
           <label className={labelClass} htmlFor="revisionType">
             {t.type}
           </label>
-          <select id="revisionType" name="revisionType" defaultValue="recent" className={inputClass}>
+          <select id="revisionType" name="revisionType" defaultValue={editing?.revision_type ?? "recent"} className={inputClass}>
             <option value="recent">{t.typeRecent}</option>
             <option value="old">{t.typeOld}</option>
           </select>
@@ -89,7 +123,15 @@ export function AddRevisionForm({
           <label className={labelClass} htmlFor="qualityRating">
             {t.quality}
           </label>
-          <input id="qualityRating" name="qualityRating" type="number" min={1} max={5} className={inputClass} />
+          <input
+            id="qualityRating"
+            name="qualityRating"
+            type="number"
+            min={1}
+            max={5}
+            defaultValue={editing?.quality_rating ?? undefined}
+            className={inputClass}
+          />
         </div>
       </div>
 
@@ -105,7 +147,7 @@ export function AddRevisionForm({
         </button>
         <button
           type="button"
-          onClick={() => setManuallyOpened(false)}
+          onClick={() => (editing ? onDone?.() : setManuallyOpened(false))}
           className="inline-flex items-center justify-center rounded-full border border-brand-dark/15 px-6 py-2.5 text-sm font-semibold text-brand-dark/70 transition-colors hover:bg-brand-dark/5"
         >
           {t.cancel}

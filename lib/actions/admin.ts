@@ -66,6 +66,7 @@ export async function createGroupAction(formData: FormData): Promise<ActionResul
   const programId = String(formData.get("programId") ?? "").trim();
   const levelId = String(formData.get("levelId") ?? "").trim();
   const teacherId = String(formData.get("teacherId") ?? "").trim();
+  const maqraaId = String(formData.get("maqraaId") ?? "").trim();
   const capacityRaw = String(formData.get("capacity") ?? "").trim();
   const locale = getLocale(formData);
 
@@ -81,6 +82,7 @@ export async function createGroupAction(formData: FormData): Promise<ActionResul
     program_id: programId || null,
     level_id: levelId || null,
     teacher_id: teacherId || null,
+    maqraa_id: maqraaId || null,
     capacity: Number.isFinite(capacity) && capacity > 0 ? capacity : 8,
   });
 
@@ -88,6 +90,42 @@ export async function createGroupAction(formData: FormData): Promise<ActionResul
 
   revalidatePath(`/${locale}/admin/groups`);
   redirect(`/${locale}/admin/groups`);
+}
+
+export async function createMaqraaAction(formData: FormData): Promise<ActionResult> {
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const locale = getLocale(formData);
+
+  const supabase = await assertAdmin();
+  if (!supabase) return { success: false, error: "generic" };
+  if (!name) return { success: false, error: "missing_fields" };
+
+  const { error } = await supabase.from("maqraas").insert({
+    name,
+    description: description || null,
+  });
+
+  if (error) return { success: false, error: "generic" };
+
+  revalidatePath(`/${locale}/admin/maqraas`);
+  redirect(`/${locale}/admin/maqraas`);
+}
+
+export async function deleteMaqraaAction(formData: FormData): Promise<ActionResult> {
+  const maqraaId = String(formData.get("maqraaId") ?? "").trim();
+  const locale = getLocale(formData);
+
+  const supabase = await assertAdmin();
+  if (!supabase) return { success: false, error: "generic" };
+  if (!maqraaId) return { success: false, error: "missing_fields" };
+
+  const { error } = await supabase.from("maqraas").delete().eq("id", maqraaId);
+  if (error) return { success: false, error: "generic" };
+
+  revalidatePath(`/${locale}/admin/maqraas`);
+  revalidatePath(`/${locale}/admin/groups`);
+  return { success: true };
 }
 
 export async function assignStudentGroupAction(formData: FormData): Promise<ActionResult> {

@@ -9,10 +9,12 @@ export function DeleteItemButton({
   action,
   hiddenFields,
   label,
+  confirmMessage,
 }: {
   action: (formData: FormData) => Promise<ActionResult>;
   hiddenFields: Record<string, string>;
   label: string;
+  confirmMessage?: string;
 }) {
   const [, formAction, pending] = useActionState<ActionResult | null, FormData>(
     async (_prev, formData) => action(formData),
@@ -20,7 +22,14 @@ export function DeleteItemButton({
   );
 
   return (
-    <form action={formAction}>
+    <form
+      action={formAction}
+      onSubmit={(e) => {
+        if (confirmMessage && !window.confirm(confirmMessage)) {
+          e.preventDefault();
+        }
+      }}
+    >
       {Object.entries(hiddenFields).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}

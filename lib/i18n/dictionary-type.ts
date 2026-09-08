@@ -351,6 +351,8 @@ export interface Dictionary {
       emptyBody: string;
       colName: string;
       colEmail: string;
+      deleteButton: string;
+      confirmDelete: string;
       form: {
         title: string;
         fullName: string;
@@ -426,6 +428,8 @@ export interface Dictionary {
       colGroup: string;
       unassigned: string;
       assignButton: string;
+      deleteButton: string;
+      confirmDelete: string;
       assignForm: {
         title: string;
         group: string;

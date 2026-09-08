@@ -5,6 +5,8 @@ import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionary-type";
 import { AddStudentForm } from "./add-student-form";
 import { AssignGroupControl } from "./assign-group-control";
+import { DeleteItemButton } from "./delete-item-button";
+import { deleteStudentAction } from "@/lib/actions/admin";
 
 function calculateAge(dateOfBirth: string): number {
   const dob = new Date(dateOfBirth);
@@ -72,6 +74,7 @@ export function StudentsPageClient({
                 <th className="px-4 py-3 text-start font-semibold text-brand-dark/70">{t.colAge}</th>
                 <th className="px-4 py-3 text-start font-semibold text-brand-dark/70">{t.colStatus}</th>
                 <th className="px-4 py-3 text-start font-semibold text-brand-dark/70">{t.colGroup}</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-dark/10">
@@ -84,6 +87,14 @@ export function StudentsPageClient({
                   </td>
                   <td className="px-4 py-3">
                     <AssignGroupControl dict={dict} studentId={s.id} currentGroupId={s.group_id} groups={groups} />
+                  </td>
+                  <td className="px-4 py-3 text-end">
+                    <DeleteItemButton
+                      action={deleteStudentAction}
+                      hiddenFields={{ studentId: s.id, locale }}
+                      label={t.deleteButton}
+                      confirmMessage={t.confirmDelete}
+                    />
                   </td>
                 </tr>
               ))}

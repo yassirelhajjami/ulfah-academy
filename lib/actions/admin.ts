@@ -61,6 +61,38 @@ export async function addTeacherAction(formData: FormData): Promise<ActionResult
   redirect(`/${locale}/admin/teachers`);
 }
 
+export async function deleteTeacherAction(formData: FormData): Promise<ActionResult> {
+  const teacherId = String(formData.get("teacherId") ?? "").trim();
+  const locale = getLocale(formData);
+
+  const supabase = await assertAdmin();
+  if (!supabase) return { success: false, error: "generic" };
+  if (!teacherId) return { success: false, error: "missing_fields" };
+
+  const serviceRole = createServiceRoleClient();
+  const { error } = await serviceRole.auth.admin.deleteUser(teacherId);
+  if (error) return { success: false, error: "generic" };
+
+  revalidatePath(`/${locale}/admin/teachers`);
+  revalidatePath(`/${locale}/admin/groups`);
+  return { success: true };
+}
+
+export async function deleteStudentAction(formData: FormData): Promise<ActionResult> {
+  const studentId = String(formData.get("studentId") ?? "").trim();
+  const locale = getLocale(formData);
+
+  const supabase = await assertAdmin();
+  if (!supabase) return { success: false, error: "generic" };
+  if (!studentId) return { success: false, error: "missing_fields" };
+
+  const { error } = await supabase.from("students").delete().eq("id", studentId);
+  if (error) return { success: false, error: "generic" };
+
+  revalidatePath(`/${locale}/admin/students`);
+  return { success: true };
+}
+
 export async function createGroupAction(formData: FormData): Promise<ActionResult> {
   const name = String(formData.get("name") ?? "").trim();
   const programId = String(formData.get("programId") ?? "").trim();

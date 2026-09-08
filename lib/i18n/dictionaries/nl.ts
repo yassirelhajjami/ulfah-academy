@@ -408,6 +408,8 @@ const nl: Dictionary = {
       emptyBody: "Voeg uw eerste docent toe om groepen te kunnen aanmaken.",
       colName: "Naam",
       colEmail: "E-mail",
+      deleteButton: "Verwijderen",
+      confirmDelete: "Weet u zeker dat u deze docent wilt verwijderen? Het account wordt permanent verwijderd en de docent wordt losgekoppeld van zijn/haar groepen.",
       form: {
         title: "Nieuwe docent toevoegen",
         fullName: "Volledige naam",
@@ -483,6 +485,8 @@ const nl: Dictionary = {
       colGroup: "Groep",
       unassigned: "Niet toegewezen",
       assignButton: "Groep toewijzen",
+      deleteButton: "Verwijderen",
+      confirmDelete: "Weet u zeker dat u deze leerling wilt verwijderen? Alle gegevens (memorisatie, herhaling, rapporten) worden permanent verwijderd.",
       assignForm: {
         title: "Leerling aan een groep toewijzen",
         group: "Groep",

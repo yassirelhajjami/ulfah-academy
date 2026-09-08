@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionary-type";
 import { AddTeacherForm } from "./add-teacher-form";
+import { DeleteItemButton } from "./delete-item-button";
+import { deleteTeacherAction } from "@/lib/actions/admin";
 
 export type TeacherRow = { id: string; full_name: string; email: string };
 
@@ -51,6 +53,7 @@ export function TeachersPageClient({
               <tr>
                 <th className="px-4 py-3 text-start font-semibold text-brand-dark/70">{t.colName}</th>
                 <th className="px-4 py-3 text-start font-semibold text-brand-dark/70">{t.colEmail}</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-dark/10">
@@ -59,6 +62,14 @@ export function TeachersPageClient({
                   <td className="px-4 py-3 font-medium text-brand-dark">{teacher.full_name}</td>
                   <td className="px-4 py-3 text-brand-dark/70" dir="ltr">
                     {teacher.email}
+                  </td>
+                  <td className="px-4 py-3 text-end">
+                    <DeleteItemButton
+                      action={deleteTeacherAction}
+                      hiddenFields={{ teacherId: teacher.id, locale }}
+                      label={t.deleteButton}
+                      confirmMessage={t.confirmDelete}
+                    />
                   </td>
                 </tr>
               ))}

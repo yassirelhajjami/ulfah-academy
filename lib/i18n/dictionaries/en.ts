@@ -408,6 +408,8 @@ const en: Dictionary = {
       emptyBody: "Add your first teacher to start creating groups.",
       colName: "Name",
       colEmail: "Email",
+      deleteButton: "Delete",
+      confirmDelete: "Are you sure you want to delete this teacher? Their account will be permanently deleted and they will be unassigned from their groups.",
       form: {
         title: "Add a New Teacher",
         fullName: "Full Name",
@@ -483,6 +485,8 @@ const en: Dictionary = {
       colGroup: "Group",
       unassigned: "Unassigned",
       assignButton: "Assign Group",
+      deleteButton: "Delete",
+      confirmDelete: "Are you sure you want to delete this student? All their records (memorization, revision, reports) will be permanently deleted.",
       assignForm: {
         title: "Assign Student to a Group",
         group: "Group",

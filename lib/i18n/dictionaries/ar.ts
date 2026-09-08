@@ -467,6 +467,8 @@ const ar: Dictionary = {
       emptyBody: "أضف أول معلم لبدء إنشاء الحلقات.",
       colName: "الاسم",
       colEmail: "البريد الإلكتروني",
+      deleteButton: "حذف",
+      confirmDelete: "هل أنت متأكد من حذف هذا المعلم؟ سيتم حذف حسابه نهائياً وإلغاء تعيينه من حلقاته.",
       form: {
         title: "إضافة معلم جديد",
         fullName: "الاسم الكامل",
@@ -542,6 +544,8 @@ const ar: Dictionary = {
       colGroup: "الحلقة",
       unassigned: "غير موزَّع",
       assignButton: "تعيين حلقة",
+      deleteButton: "حذف",
+      confirmDelete: "هل أنت متأكد من حذف هذا الطالب؟ سيتم حذف جميع سجلاته (الحفظ، المراجعة، التقارير) نهائياً.",
       assignForm: {
         title: "تعيين الطالب لحلقة",
         group: "الحلقة",

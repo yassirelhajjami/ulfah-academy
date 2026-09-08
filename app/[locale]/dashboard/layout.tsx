@@ -28,6 +28,13 @@ export default async function DashboardLayout({
     .eq("id", user.id)
     .single();
 
+  if (profile?.role === "admin" || profile?.role === "super_admin") {
+    redirect(localizedHref(locale, "/admin"));
+  }
+  if (profile?.role === "teacher") {
+    redirect(localizedHref(locale, "/teacher"));
+  }
+
   return (
     <DashboardShell dict={dict} locale={locale} fullName={profile?.full_name ?? null}>
       {children}
